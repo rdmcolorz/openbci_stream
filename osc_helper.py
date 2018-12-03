@@ -29,7 +29,7 @@ def exit_print(signal, frame):
 
 # Record received message in text file
 def record_to_file(*args):
-    textfile.write(str(time.time()) + ",")
+    #textfile.write(str(time.time()) + ",")
     textfile.write(",".join(str(x) for x in args))
     textfile.write("\n")
 
