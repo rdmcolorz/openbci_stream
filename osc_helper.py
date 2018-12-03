@@ -28,10 +28,7 @@ def exit_print(signal, frame):
     sys.exit(0)
 
 # Record received message in text file
-def record_to_file(*args):
-    #textfile.write(str(time.time()) + ",")
-    textfile.write(",".join(str(x) for x in args))
-    textfile.write("\n")
+
 
 # Save recording, clean exit from record mode
 def close_file(*args):
