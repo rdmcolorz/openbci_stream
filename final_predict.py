@@ -94,13 +94,12 @@ def predict():
     # Create the Estimator
     classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths["Model"])
     # Create the input functions.
-    demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
+    demo_eval_input_fn = create_predict_input_fn(demo_data, 1)
 
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
     classes = [x["classes"] for x in results]
     probs = [x["probabilities"] for x in results]
     print(probs)
-
     result = classes[0]
     # Turn wemo device on and off
     on = "wemo switch \"cerebro plug\" on"

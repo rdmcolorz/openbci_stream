@@ -72,6 +72,7 @@ dir=os.getcwd() + "/stream_files"
 while (True):
     fls=latest_txt_files(dir,10)
     list_ = []
+    print(fls[0])
     for file_ in fls:
         df = pd.read_csv(file_,index_col=None, header=0)
         list_.append(df)
