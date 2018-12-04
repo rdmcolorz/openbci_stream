@@ -4,6 +4,8 @@ import pandas as pd
 #import pygame
 import timeit
 from helpers import *
+import tensorflow as tf
+from tensorflow.python.data import Dataset
 from spectrogram_func import *
 from predictModel import *
 from predictModel import _parse_function
@@ -21,7 +23,7 @@ pattern = "[0-9]{2}_[0-9]{2}"
 IMG_EXT = ".png"
 VERBOSITY = 1000
 CHANNELS = [1,2,3,4]
-NUM_CHANNELS = 22
+NUM_CHANNELS = 4
 CATS, MONTHS, DAYS, LABELS, SEQ, SETS = [], [], [], [], [], []
 CATEGORY = ["no_voice"]
 LABELS = ["one","two"]
@@ -37,7 +39,7 @@ IMG_ROOT = os.getcwd() + "/imgs/"
 OUTPUT = os.getcwd() + "/predict.csv"
 paths = {
     "Training":AUDIO_ROOT+"paths_scaled_combined.csv",
-    "Model": ROOT+"demoModelOutliers",
+    "Model": ROOT+"/demo_model",
     "Logs":RUN_ROOT_LOG+"{}_{}/".format(NUMS, datetime.strftime(curr_time(), "%b%d%Y_%H%M%S"))
 }
 paths["Log"] = paths["Logs"] + "log.txt"
@@ -51,22 +53,17 @@ if not os.path.isdir(paths["Logs"]):
 #################################
 
 def predict():
-    with open(paths["Log"], 'w') as log:
-       log.write(make_header("Starting Script\n"))
-
     demo_data = pd.read_csv("./predict.csv")
-
     # Filter the predict data
-    demo_data = select_categories(demo_data, CATEGORY)
-    demo_data = select_channels(demo_data, CHANNELS)
+    #demo_data = select_categories(demo_data, CATEGORY)
+    #demo_data = select_channels(demo_data, CHANNELS)
     #demo_data = select_labels(demo_data, LABELS)
     #demo_data = select_months(demo_data, MONTHS)
     #demo_data = select_days(demo_data, DAYS)
     # train_data = remove_voice(train_data)
-    demo_data = demo_data.sample(frac=1).reset_index(drop=True)
+    #demo_data = demo_data.sample(frac=1).reset_index(drop=True)
     tdcopy = pd.DataFrame(demo_data)
-
-    #demo_data["Label"] = demo_data["Label"].map(labels)
+    demo_data["Label"] = demo_data["Label"].map(labels)
     # if VERBOSE:
     #     print_and_log_header("TRAIN DATA")
     #     print_and_log(demo_data.describe())
@@ -94,13 +91,15 @@ def predict():
     # Create the Estimator
     classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths["Model"])
     # Create the input functions.
-    demo_eval_input_fn = create_predict_input_fn(demo_data, 1)
+    demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
 
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
     classes = [x["classes"] for x in results]
     probs = [x["probabilities"] for x in results]
-    print(probs)
+    #print(probs)
+
     result = classes[0]
+    print("one :{:f}, two : {:f}".format(probs[0][0], probs[0][1]))
     # Turn wemo device on and off
     on = "wemo switch \"cerebro plug\" on"
     off = "wemo switch \"cerebro plug\" off"

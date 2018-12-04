@@ -15,7 +15,7 @@ def latest_txt_files(path,qty):
     files = os.listdir(path)
     paths = [os.path.join(path, basename) for basename in files if basename.endswith(".txt")]
     s_paths = sorted(paths, key=os.path.getctime, reverse=True)
-    ss_paths = sorted(s_paths[:qty])
+    ss_paths = sorted(s_paths[:qty], key=os.path.getctime)
     return ss_paths
 
 def channel2wav(frame, ch, max_data):
@@ -72,7 +72,6 @@ dir=os.getcwd() + "/stream_files"
 while (True):
     fls=latest_txt_files(dir,10)
     list_ = []
-    print(fls[0])
     for file_ in fls:
         df = pd.read_csv(file_,index_col=None, header=0)
         list_.append(df)

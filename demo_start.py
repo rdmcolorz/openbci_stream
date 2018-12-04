@@ -114,7 +114,6 @@ def predict():
     # reverse_lookup = {labels[k]:k for k in labels}
 
     demo_data = pd.read_csv("./predict.csv")
-
     # Filter the predict data
     demo_data = select_categories(demo_data, CATEGORY)
     demo_data = select_channels(demo_data, CHANNELS)
@@ -147,6 +146,8 @@ def predict():
     demo_labels = tf.constant(demo_labels)
 
     # Make datasets from filenames and labels
+    print(demo_labels)
+    print(t_f)
     demo_data = tf.data.Dataset.from_tensor_slices((demo_labels, *t_f))
     demo_data = timer(lambda: demo_data.map(_parse_function))
     # Create the Estimator

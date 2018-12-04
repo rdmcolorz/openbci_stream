@@ -178,11 +178,32 @@ def str_to_l(x):
     return [int(n) for n in x if n <= '9' and n >= '0']
 
 count = 0
+# def _parse_function(label, *filenames):
+#     global count
+#     count += 1
+#     #if count % VERBOSITY == 0:
+#         #print_and_log("\tProcessed {}th image".format(count))
+#     expected_shape = tf.constant([1, INPUT_HEIGHT, INPUT_WIDTH, IMG_CHANNELS])
+#     image = None
+#     for filename in filenames:
+#         image_string = tf.read_file(filename)
+#         image_decoded = tf.image.decode_image(image_string, channels=IMG_CHANNELS)
+#         image_decoded = tf.image.convert_image_dtype(image_decoded, tf.float32)
+#         image_decoded = tf.reshape(image_decoded, expected_shape)
+#         image_decoded = tf.image.rgb_to_grayscale(image_decoded)
+#         if RESIZE:
+#             image_decoded = tf.image.resize_bicubic(image_decoded, [TARGET_HEIGHT, TARGET_WIDTH])
+#         if image is not None:
+#             image = tf.concat([image, image_decoded], 3)
+#         else:
+#             image = image_decoded
+#     return image, label
+
 def _parse_function(label, *filenames):
     global count
     count += 1
-    #if count % VERBOSITY == 0:
-        #print_and_log("\tProcessed {}th image".format(count))
+    if count % VERBOSITY == 0:
+        print_and_log("\tProcessed {}th image".format(count))
     expected_shape = tf.constant([1, INPUT_HEIGHT, INPUT_WIDTH, IMG_CHANNELS])
     image = None
     for filename in filenames:

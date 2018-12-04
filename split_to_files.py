@@ -26,6 +26,8 @@ def stream_window(*args):
     
     sample_data.append(args[1:])
     g_iter += 1
+    if file_i == 30:
+        file_i = 0
     if g_iter == 20:
         sample = np.array(sample_data)
         sample_array = sample.reshape(20,4)
@@ -67,7 +69,7 @@ if __name__ == "__main__":
 
         # Display server attributes
         print('--------------------')
-        print("-- OSC LISTENER -- ")
+        print(" -- OSC LISTENER -- ")
         print('--------------------')
         print("IP:", args.ip)
         print("PORT:", args.port)
@@ -76,7 +78,7 @@ if __name__ == "__main__":
         print("%s option selected" % args.option)
 
         # connect server
-        server = osc_server.ThreadingOSCUDPServer(
+        server = osc_server.OSCUDPServer(
             (args.ip, args.port), dispatcher)
         server.serve_forever()
     else:
