@@ -26,14 +26,14 @@ def stream_window(*args):
     
     sample_data.append(args[1:])
     g_iter += 1
-    if file_i == 30:
+    if file_i == 100:
         file_i = 0
     if g_iter == 20:
         sample = np.array(sample_data)
         sample_array = sample.reshape(20,4)
         df = pd.DataFrame(sample_array, columns=["ch1", "ch2", "ch3", "ch4"]) 
         df.to_csv(STREAM_ROOT + str(file_i) + ".txt", ",")
-        print(file_i, "Produced csv") 
+        print("Produced csv no: {}".format(file_i)) 
         file_i += 1
         g_iter = 0
         sample_data = []

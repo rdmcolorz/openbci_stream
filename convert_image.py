@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.io import wavfile
-from scipy.signal import resample
 from final_predict import predict
 import librosa
 import librosa.display
@@ -18,16 +17,26 @@ def latest_txt_files(path,qty):
     ss_paths = sorted(s_paths[:qty], key=os.path.getctime)
     return ss_paths
 
-def channel2wav(frame, ch, max_data):
+def channel2wav(frame, ch):
+    ch1_max = 184
+    ch2_max = 4416
+    ch3_max = 203
+    ch4_max = 191
     output_dir='latest_wav'
     data = np.array(frame[ch], dtype='float64')
     #data /= np.max(np.abs(data))
-    data /= max_data
-    data_resampled = resample(data, len(data) * 40) #since openbci is already sampled at 200
+    if ch == "ch1":
+        data /= ch1_max
+    if ch == "ch2":
+        data /= ch2_max
+    if ch == "ch3":
+        data /= ch3_max
+    if ch == "ch4":
+        data /= ch4_max
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     name = "%s/%s.wav"%(output_dir,ch)
-    wavfile.write(name, 201 * 40, data_resampled)
+    wavfile.write(name, 200, data)
     #print ("%s file is written"%(name))
 
 def preprocess(samples, sample_rate, multiplier=1):
@@ -36,6 +45,21 @@ def preprocess(samples, sample_rate, multiplier=1):
     samples = samples[:sr]
     padded[:samples.shape[0]] = samples
     return padded
+
+def run_command(command):
+	NULL = open(os.devnull, 'w')
+	subprocess.run(command, stdout=NULL, stderr=NULL)
+
+def downsample(audio_path, sample_rate=8000):
+	new_audio_path = os.path.join(os.getcwd() + "/downsampled")
+	if not os.path.isdir(new_audio_path):
+		os.mkdir(new_audio_path)
+	for wavfile in [f for f in os.listdir(audio_path) if f.endswith(".wav")]:
+		original_filepath = os.path.join(audio_path, wavfile)
+		new_filepath = os.path.join(new_audio_path, wavfile)
+		command = ["ffmpeg", "-i", original_filepath, "-ar", str(sample_rate), new_filepath]
+		#print("\tDownsampling {} to {}Hz".format(original_filepath, sample_rate))
+		run_command(command)
 
 def process(input_dir, output_dir):
     items = 0
@@ -68,6 +92,7 @@ def process(input_dir, output_dir):
 
 # replace for folder name that you need
 dir=os.getcwd() + "/stream_files"
+audio = os.getcwd() + "/latest_wav/"
 
 while (True):
     fls=latest_txt_files(dir,10)
@@ -77,12 +102,12 @@ while (True):
         list_.append(df)
 
     frame = pd.concat(list_, axis = 0, ignore_index = True)
-
     # need to be replace with constants obtained from main data
     mx=frame.max()
     cols=['ch1','ch2','ch3','ch4']
-
     for ch in cols:
-        channel2wav(frame,ch,mx[ch])
-    process("latest_wav","latest_spec")
+        channel2wav(frame,ch)
+    downsample(audio, 8000)
+    process("downsampled","latest_spec")
     predict()
+    shutil.rmtree(os.getcwd() + "/downsampled")

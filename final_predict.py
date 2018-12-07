@@ -8,6 +8,7 @@ import tensorflow as tf
 from tensorflow.python.data import Dataset
 from spectrogram_func import *
 from predictModel import *
+from termcolor import colored
 from predictModel import _parse_function
 from osc_helper import *
 if sys.version_info.major == 3:
@@ -26,7 +27,7 @@ CHANNELS = [1,2,3,4]
 NUM_CHANNELS = 4
 CATS, MONTHS, DAYS, LABELS, SEQ, SETS = [], [], [], [], [], []
 CATEGORY = ["no_voice"]
-LABELS = ["one","two"]
+LABELS = ["lights-on","turn-off"]
 NUMS = ''.join([str(x) for x in CHANNELS])
 MONTHS = [11]
 DAYS = [25]
@@ -62,7 +63,7 @@ def predict():
     #demo_data = select_days(demo_data, DAYS)
     # train_data = remove_voice(train_data)
     #demo_data = demo_data.sample(frac=1).reset_index(drop=True)
-    tdcopy = pd.DataFrame(demo_data)
+    #tdcopy = pd.DataFrame(demo_data)
     demo_data["Label"] = demo_data["Label"].map(labels)
     # if VERBOSE:
     #     print_and_log_header("TRAIN DATA")
@@ -99,20 +100,17 @@ def predict():
     #print(probs)
 
     result = classes[0]
-    print("one :{:f}, two : {:f}".format(probs[0][0], probs[0][1]))
+    print("lights-on :{:f}, turn-off : {:f}".format(probs[0][0], probs[0][1]))
     # Turn wemo device on and off
     on = "wemo switch \"cerebro plug\" on"
     off = "wemo switch \"cerebro plug\" off"
     on_off = [on, off]
 
-    #print(result)
-    if result < 2:
-        #subprocess.run(on_off[result], shell=True)
-        if result == 0 and probs[0][result] > 0.7:
-            print("-" * 21 + "\n     Lights ON!\n" + "-" * 21)
-        elif result == 1 and probs[0][result] > 0.7:
-            print("-" * 21 + "\n     Lights OFF!\n" + "-" * 21)
-        else:
-            print("-" * 21 + "\nNothing Happened :(\n" + "-" * 21)
+    #subprocess.run(on_off[result], shell=True) # triggers the wemo swithces
+
+    if result == 0 and probs[0][result] > 0.95:
+        print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
+    elif result == 1 and probs[0][result] > 0.6:
+        print(colored("-" * 21 + "\n     Lights OFF!\n" + "-" * 21, 'yellow'))
     else:
-        print("-" * 21 + "\n Nothing Happened !\n" + "-" * 21)
+        print(colored("-" * 21 + "\nNothing Happened :(\n" + "-" * 21, 'red'))

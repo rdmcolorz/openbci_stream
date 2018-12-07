@@ -16,7 +16,7 @@ import subprocess
 
 # NOTES
 CATEGORY = ["no_voice"]
-LABELS = ["one", "two"]
+LABELS = ["lights-on", "turn-off"]
 CHANNELS = [1, 2, 3, 4]
 NUMS = ''.join([str(x) for x in CHANNELS])
 MONTHS = [11]
