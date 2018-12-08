@@ -5,17 +5,11 @@ import pandas as pd
 import timeit
 from helpers import *
 import tensorflow as tf
-from tensorflow.python.data import Dataset
+#from tensorflow.python.data import Dataset
 from spectrogram_func import *
 from predictModel import *
 from termcolor import colored
 from predictModel import _parse_function
-from osc_helper import *
-if sys.version_info.major == 3:
-    from pythonosc import dispatcher
-    from pythonosc import osc_server
-elif sys.version_info.major == 2:
-    import OSC
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 
@@ -76,7 +70,7 @@ def predict():
     demo_data = demo_data[img_paths]
 
     # Vectors of filenames.
-    t_f, v_f, s_f = [], [], []
+    t_f = []
     for i in range(1, 1 + len(CHANNELS)):
         channel = CHANNELS[i-1]
         l = "Path{}".format(channel)

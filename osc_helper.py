@@ -1,18 +1,3 @@
-import argparse
-import time
-import atexit
-import os
-import signal
-import sys
-import numpy as np
-from scipy.io import wavfile
-from scipy.signal import resample
-if sys.version_info.major == 3:
-    from pythonosc import dispatcher
-    from pythonosc import osc_server
-elif sys.version_info.major == 2:
-    import OSC
-
 def print_message(*args):
     try:
         current = time.time()
@@ -26,9 +11,6 @@ def print_message(*args):
 def exit_print(signal, frame):
     print("Closing listener")
     sys.exit(0)
-
-# Record received message in text file
-
 
 # Save recording, clean exit from record mode
 def close_file(*args):
