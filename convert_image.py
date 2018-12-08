@@ -9,6 +9,8 @@ from scipy.io import wavfile
 from final_predict import predict
 import librosa
 import librosa.display
+from termcolor import colored
+import time
 
 def latest_txt_files(path,qty):
     files = os.listdir(path)
@@ -95,6 +97,9 @@ dir=os.getcwd() + "/stream_files"
 audio = os.getcwd() + "/latest_wav/"
 
 while (True):
+    time.sleep(1)
+    print(colored("-" * 21 + "\nSay command : \n" + "-" * 21, 'white'))
+    time.sleep(1)
     fls=latest_txt_files(dir,10)
     list_ = []
     for file_ in fls:

@@ -1,5 +1,6 @@
 # OpenBCI data prediction stream
 - This is the repo to that takes OpenBCI data with the networking widget and uses OSC to stream data to the macbook.
+Uses the python-osc library to communicate with the OpenBCI device.
 
 #### `split_to_files.py`
 - Reads in the OpenBCI from the OSC server, takes 20 data points and converts them to csv files continuously up to 30 files,

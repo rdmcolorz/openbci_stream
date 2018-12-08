@@ -104,13 +104,12 @@ def predict():
     # Turn wemo device on and off
     on = "wemo switch \"cerebro plug\" on"
     off = "wemo switch \"cerebro plug\" off"
-    on_off = [on, off]
 
-    #subprocess.run(on_off[result], shell=True) # triggers the wemo swithces
-
-    if result == 0 and probs[0][result] > 0.95:
+    if result == 0 and probs[0][result] > 0.75:
         print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-    elif result == 1 and probs[0][result] > 0.6:
-        print(colored("-" * 21 + "\n     Lights OFF!\n" + "-" * 21, 'yellow'))
+        #subprocess.run(on, shell=True) # triggers the wemo swithces
+    elif result == 1 and probs[0][result] > 0.75:
+        print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
+        #subprocess.run(off, shell=True) # triggers the wemo swithces
     else:
         print(colored("-" * 21 + "\nNothing Happened :(\n" + "-" * 21, 'red'))
