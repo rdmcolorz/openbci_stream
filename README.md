@@ -12,8 +12,8 @@
 - Reads in the OpenBCI from the OSC server, takes 20 data points and converts them to csv files continuously up to 30 files,
 and then rewrites them.
 
-- Additional parameters
-# `--option` 
+##### Additional parameters
+- `--option` 
   - print : prints the data streaming from the device.
   - record: records the data from the device to a txt file
   - predict: runs the data through a CNN model and predicts what the data means. (ex: 'yes' or 'no')
