@@ -13,10 +13,10 @@
 and then rewrites them.
 
 - Additional parameters
-`--option` 
-  print : prints the data streaming from the device.
-  record: records the data from the device to a txt file
-  predict: runs the data through a CNN model and predicts what the data means. (ex: 'yes' or 'no')
+# `--option` 
+  - print : prints the data streaming from the device.
+  - record: records the data from the device to a txt file
+  - predict: runs the data through a CNN model and predicts what the data means. (ex: 'yes' or 'no')
 
 #### `convert_image.py`
 - Run this code to grab data from the chunks `split_to_files.py` outputs, and stiches 10 files together to produce a second of data
