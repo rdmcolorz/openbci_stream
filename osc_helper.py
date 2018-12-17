@@ -1,3 +1,5 @@
+import time, sys
+
 def print_message(*args):
     try:
         current = time.time()
@@ -10,12 +12,6 @@ def print_message(*args):
 # Clean exit from print mode
 def exit_print(signal, frame):
     print("Closing listener")
-    sys.exit(0)
-
-# Save recording, clean exit from record mode
-def close_file(*args):
-    print("\nFILE SAVED")
-    textfile.close()
     sys.exit(0)
 
 def channel2wav(ch_data, fname, ch):

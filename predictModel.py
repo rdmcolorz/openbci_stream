@@ -16,7 +16,7 @@ import subprocess
 
 # NOTES
 CATEGORY = ["no_voice"]
-LABELS = ["lights-on", "turn-off"]
+LABELS = ["lights-on", "turn-off", "---"]
 CHANNELS = [1, 2, 3, 4]
 NUMS = ''.join([str(x) for x in CHANNELS])
 MONTHS = [11]
@@ -81,8 +81,8 @@ train_csv = paths["Training"]
 
 # Store the labels to train
 all_labels = LABELS
-labels = ["one", "two", "silence"]
-num_labels = len(labels) - 1
+labels = LABELS
+num_labels = len(labels)
 labels = {x[1]:x[0] for x in enumerate(labels)}
 reverse_lookup = {labels[k]:k for k in labels}
 

@@ -1,4 +1,5 @@
 # OpenBCI data prediction stream
+- Device used: OpenBCI Ganglion
 - This is the repo to that takes OpenBCI data with the networking widget and uses OSC to stream data to the macbook.
 Uses the python-osc library to communicate with the OpenBCI device.
 

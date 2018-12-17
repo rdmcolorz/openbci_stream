@@ -33,7 +33,7 @@ IMG_ROOT = os.getcwd() + "/imgs/"
 OUTPUT = os.getcwd() + "/predict.csv"
 paths = {
     "Training":AUDIO_ROOT+"paths_scaled_combined.csv",
-    "Model": ROOT+"/demo_model",
+    "Model": ROOT+"/voice_model",
     "Logs":RUN_ROOT_LOG+"{}_{}/".format(NUMS, datetime.strftime(curr_time(), "%b%d%Y_%H%M%S"))
 }
 paths["Log"] = paths["Logs"] + "log.txt"
@@ -46,7 +46,7 @@ if not os.path.isdir(paths["Logs"]):
 
 #################################
 
-def predict():
+def voice_predict():
     demo_data = pd.read_csv("./predict.csv")
     # Filter the predict data
     #demo_data = select_categories(demo_data, CATEGORY)
