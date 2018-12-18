@@ -30,11 +30,11 @@ def channel2wav(frame, ch):
     #data /= np.max(np.abs(data))
     if ch == "ch1":
         data /= ch1_max
-    if ch == "ch2":
+    elif ch == "ch2":
         data /= ch2_max
-    if ch == "ch3":
+    elif ch == "ch3":
         data /= ch3_max
-    if ch == "ch4":
+    elif ch == "ch4":
         data /= ch4_max
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
