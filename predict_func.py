@@ -1,34 +1,29 @@
-import argparse, time, atexit, signal
+import argparse, time, atexit, signal, time
 import os, sys, subprocess, threading, shutil
 import pandas as pd
 #import pygame
-import timeit
-from helpers import *
 import tensorflow as tf
-from spectrogram_func import *
-from predictModel import *
-from termcolor import colored
+from model_func import *
 from predictModel import _parse_function
+from termcolor import colored
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 
 # make images VARS  #############
 pattern = "[0-9]{2}_[0-9]{2}"
-IMG_EXT = ".png"
 VERBOSITY = 1000
 CHANNELS = [1,2,3,4]
-NUM_CHANNELS = 4
-CATS, MONTHS, DAYS, LABELS, SEQ, SETS = [], [], [], [], [], []
 CATEGORY = ["no_voice"]
-LABELS = ["lights-on","turn-off","---"]
+LABELS = ["lights-on", "turn-off", "---"]
+ENCODE_LABELS = {x[1]:x[0] for x in enumerate(LABELS)}
 NUMS = ''.join([str(x) for x in CHANNELS])
-MONTHS = [11]
-DAYS = [25]
+target_label = "Label"
 POOL = 0
 lights_on = 0
 turn_off = 0
 silence = 0
-REWRITE = True # rewrites the spectrograms for every recording use False to debug certain spectrograms
+on = "wemo switch \"cerebro plug\" on"
+off = "wemo switch \"cerebro plug\" off"
 
 # Path vars #####################
 ROOT = os.getcwd()
@@ -36,28 +31,21 @@ AUDIO_ROOT = os.getcwd() + "/audio/"
 IMG_ROOT = os.getcwd() + "/imgs/"
 OUTPUT = os.getcwd() + "/predict.csv"
 paths = {
-    "Training":AUDIO_ROOT+"paths_scaled_combined.csv",
-    "Model": ROOT+"/voice_model",
-    "Logs":RUN_ROOT_LOG+"{}_{}/".format(NUMS, datetime.strftime(curr_time(), "%b%d%Y_%H%M%S"))
+    "vocal": ROOT+"/models/vocal_model",
+    "subvocal": ROOT + "/models/subvocal_model",
 }
-paths["Log"] = paths["Logs"] + "log.txt"
-if not os.path.isdir(RUN_ROOT):
-    os.mkdir(RUN_ROOT)
-if not os.path.isdir(RUN_ROOT_LOG):
-    os.mkdir(RUN_ROOT_LOG)
-if not os.path.isdir(paths["Logs"]):
-    os.mkdir(paths["Logs"])
+DEFAULT_BS = 1
 
 #################################
 
-def voice_predict(start):
+def predict(model):
     global POOL
     global lights_on
     global turn_off
     global silence 
 
     demo_data = pd.read_csv("./predict.csv")
-    demo_data["Label"] = demo_data["Label"].map(labels)
+    demo_data["Label"] = demo_data["Label"].map(ENCODE_LABELS)
     demo_labels = demo_data.pop(target_label)
     img_paths = ["Path{}".format(channel) for channel in CHANNELS]
     demo_data = demo_data[img_paths]
@@ -76,20 +64,16 @@ def voice_predict(start):
     # Make datasets from filenames and labels
     demo_data = tf.data.Dataset.from_tensor_slices((demo_labels, *t_f))
     demo_data = timer(lambda: demo_data.map(_parse_function))
+
     # Create the Estimator
-    classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths["Model"])
+    classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths[model])
     # Create the input functions.
     demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
-    print("after predict", time.time() - start)
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
     classes = [x["classes"] for x in results]
     probs = [x["probabilities"] for x in results]
-
     result = classes[0]
     print("lights-on :{:f}, turn-off : {:f}, silence : {:f}".format(probs[0][0], probs[0][1], probs[0][2]))
-    # Turn wemo device on and off
-    on = "wemo switch \"cerebro plug\" on"
-    off = "wemo switch \"cerebro plug\" off"
 
     if result == 0:
         lights_on += 1
@@ -98,14 +82,13 @@ def voice_predict(start):
     else:
         silence += 1
     POOL += 1
-    print(time.time() - start)
     if POOL == 4:
         if lights_on in (2,3,4):
             print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-            subprocess.run(on, shell=True) # triggers the wemo swithces
+            #subprocess.run(on, shell=True) # triggers the wemo swithces
         elif turn_off in (2,3,4): # and probs[0][result] > 0.7:
             print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
-            subprocess.run(off, shell=True) # triggers the wemo swithces
+            #subprocess.run(off, shell=True) # triggers the wemo swithces
         else:
             print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
         POOL = 0

@@ -6,12 +6,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.io import wavfile
-from final_predict import predict
-from voice_predict import voice_predict
+#from final_predict import predict
+from predict_func import predict
 import librosa
 import librosa.display
 from termcolor import colored
 import time
+import atexit
+
+# Vars
+CH1_MAX = 200
+CH2_MAX = 1000
+CH3_MAX = 300
+CH4_MAX = 300
+CHANNELS = ['ch1','ch2','ch3','ch4']
+STREAM_FILES = os.getcwd() + "/stream_files"
+AUDIO = os.getcwd() + "/latest_wav/"
 
 def latest_txt_files(path,qty):
     files = os.listdir(path)
@@ -21,21 +31,17 @@ def latest_txt_files(path,qty):
     return ss_paths
 
 def channel2wav(frame, ch):
-    ch1_max = 200
-    ch2_max = 1000
-    ch3_max = 300
-    ch4_max = 300
     output_dir='latest_wav'
     data = np.array(frame[ch], dtype='float64')
     #data /= np.max(np.abs(data))
     if ch == "ch1":
-        data /= ch1_max
+        data /= CH1_MAX
     elif ch == "ch2":
-        data /= ch2_max
+        data /= CH2_MAX
     elif ch == "ch3":
-        data /= ch3_max
+        data /= CH3_MAX
     elif ch == "ch4":
-        data /= ch4_max
+        data /= CH4_MAX
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     name = "%s/%s.wav"%(output_dir,ch)
@@ -66,9 +72,7 @@ def downsample(audio_path, sample_rate=8000):
 
 def pure_process(input_dir, output_dir):
     plt.ioff()
-    chs=['ch1','ch2','ch3','ch4']
-
-    for channel in chs:
+    for channel in CHANNELS:
         wav_name="%s/%s.wav"%(input_dir,channel)
         sample_rate, samples = wavfile.read(wav_name)
         samples = preprocess(samples, sample_rate)
@@ -88,11 +92,10 @@ def pure_process(input_dir, output_dir):
         plt.close()
     plt.ion()
 
-def process(input_dir, output_dir):
+def process(input_dir, output_dir, model):
     plt.ioff()
-    chs=['ch1','ch2','ch3','ch4']
     for i in range(4):
-        for channel in chs:
+        for channel in CHANNELS:
             wav_name="%s/%s.wav"%(input_dir,channel)
             sample_rate, samples = wavfile.read(wav_name)
             window = 12000
@@ -113,28 +116,26 @@ def process(input_dir, output_dir):
             if not os.path.exists(_output_dir):
                 os.makedirs(_output_dir)
             name ="%s/00000.png"%(_output_dir)
-            
-            #print ("%s file is written"%(name))
             plt.savefig(name)
             plt.close()
-        start = time.time()
-        voice_predict(start)
+        predict(model)
     plt.ion()
 
+def exit_handler():
+    if os.path.exists(os.getcwd() + "/downsampled"):
+        shutil.rmtree(os.getcwd() + "/downsampled")
 
 if __name__ == "__main__":
-    # replace for folder name that you need
-    dir=os.getcwd() + "/stream_files"
-    AUDIO = os.getcwd() + "/latest_wav/"
+    atexit.register(exit_handler) # clears the downsample folder when interrupt prediction
     parser = argparse.ArgumentParser()
     parser.add_argument("--model",
         default="vocal", 
         help="The type of model, vocal for voice, subvocal for subvocal")
     args = parser.parse_args()
-        
+
     while (True):
         #print(colored("-" * 21 + "\nSay command : \n" + "-" * 21, 'white'))
-        fls=latest_txt_files(dir,20)
+        fls=latest_txt_files(STREAM_FILES,20)
         list_ = []
         #print(fls)
         for file_ in fls:
@@ -146,9 +147,5 @@ if __name__ == "__main__":
         for ch in cols:
             channel2wav(frame,ch)
         downsample(AUDIO, 8000)
-        process("downsampled","latest_spec")
-            # if args.model == 'vocal':
-            #     voice_predict()
-            # elif args.model == 'subvocal':
-            #     predict()
+        process("downsampled","latest_spec", args.model)
         shutil.rmtree(os.getcwd() + "/downsampled")
