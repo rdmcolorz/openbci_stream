@@ -108,15 +108,16 @@ if __name__ == "__main__":
     if sys.version_info.major == 3:
     # Set up necessary parameters from command line
         dispatcher = dispatcher.Dispatcher()
+        
         if args.option=="print":
             dispatcher.map("/openbci", print_message)
             signal.signal(signal.SIGINT, exit_print)
 
         elif args.option=="record":
             i = 0
-            while os.path.exists("osc_test%s.txt" % i):
+            while os.path.exists("osc_record/osc_test%s.txt" % i):
                 i += 1
-            filename = "osc_test%i.txt" % i
+            filename = "osc_record/osc_test%i.txt" % i
             textfile = open(filename, "w")
             textfile.write("time,address,messages\n")
             textfile.write("-------------------------\n")

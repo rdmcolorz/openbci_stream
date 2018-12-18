@@ -98,9 +98,9 @@ def predict():
 
     if result == 0 and probs[0][result] > 0.9:
         print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-        #subprocess.run(on, shell=True) # triggers the wemo swithces
+        subprocess.run(on, shell=True) # triggers the wemo swithces
     elif result == 1 and probs[0][result] > 0.7:
         print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
-        #subprocess.run(off, shell=True) # triggers the wemo swithces
+        subprocess.run(off, shell=True) # triggers the wemo swithces
     else:
         print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))

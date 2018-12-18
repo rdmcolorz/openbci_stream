@@ -24,6 +24,10 @@ LABELS = ["lights-on","turn-off","---"]
 NUMS = ''.join([str(x) for x in CHANNELS])
 MONTHS = [11]
 DAYS = [25]
+POOL = 0
+lights_on = 0
+turn_off = 0
+silence = 0
 REWRITE = True # rewrites the spectrograms for every recording use False to debug certain spectrograms
 
 # Path vars #####################
@@ -46,23 +50,14 @@ if not os.path.isdir(paths["Logs"]):
 
 #################################
 
-def voice_predict():
+def voice_predict(start):
+    global POOL
+    global lights_on
+    global turn_off
+    global silence 
+
     demo_data = pd.read_csv("./predict.csv")
-    # Filter the predict data
-    #demo_data = select_categories(demo_data, CATEGORY)
-    #demo_data = select_channels(demo_data, CHANNELS)
-    #demo_data = select_labels(demo_data, LABELS)
-    #demo_data = select_months(demo_data, MONTHS)
-    #demo_data = select_days(demo_data, DAYS)
-    # train_data = remove_voice(train_data)
-    #demo_data = demo_data.sample(frac=1).reset_index(drop=True)
-    #tdcopy = pd.DataFrame(demo_data)
     demo_data["Label"] = demo_data["Label"].map(labels)
-    # if VERBOSE:
-    #     print_and_log_header("TRAIN DATA")
-    #     print_and_log(demo_data.describe())
-    #     print_and_log(demo_data.head(10))
-    # # Separate Labels
     demo_labels = demo_data.pop(target_label)
     img_paths = ["Path{}".format(channel) for channel in CHANNELS]
     demo_data = demo_data[img_paths]
@@ -85,7 +80,7 @@ def voice_predict():
     classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths["Model"])
     # Create the input functions.
     demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
-
+    print("after predict", time.time() - start)
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
     classes = [x["classes"] for x in results]
     probs = [x["probabilities"] for x in results]
@@ -96,11 +91,32 @@ def voice_predict():
     on = "wemo switch \"cerebro plug\" on"
     off = "wemo switch \"cerebro plug\" off"
 
-    if result == 0 and probs[0][result] > 0.9:
-        print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-        #subprocess.run(on, shell=True) # triggers the wemo swithces
-    elif result == 1 and probs[0][result] > 0.7:
-        print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
-        #subprocess.run(off, shell=True) # triggers the wemo swithces
+    if result == 0:
+        lights_on += 1
+    elif result == 1:
+        turn_off += 1
     else:
-        print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
+        silence += 1
+    POOL += 1
+    print(time.time() - start)
+    if POOL == 4:
+        if lights_on in (2,3,4):
+            print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
+            subprocess.run(on, shell=True) # triggers the wemo swithces
+        elif turn_off in (2,3,4): # and probs[0][result] > 0.7:
+            print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
+            subprocess.run(off, shell=True) # triggers the wemo swithces
+        else:
+            print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
+        POOL = 0
+        lights_on = 0
+        turn_off = 0
+        silence = 0
+    # if ans ==  # and probs[0][result] > 0.9:
+    #     print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
+    #     subprocess.run(on, shell=True) # triggers the wemo swithces
+    # elif result == 1 # and probs[0][result] > 0.7:
+    #     print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
+    #     subprocess.run(off, shell=True) # triggers the wemo swithces
+    # else:
+    #     print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
