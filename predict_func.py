@@ -4,7 +4,7 @@ import pandas as pd
 #import pygame
 import tensorflow as tf
 from model_func import *
-from predictModel import _parse_function
+from model_func import _parse_function
 from termcolor import colored
 
 tf.logging.set_verbosity(tf.logging.ERROR)
@@ -75,26 +75,36 @@ def predict(model):
     result = classes[0]
     print("lights-on :{:f}, turn-off : {:f}, silence : {:f}".format(probs[0][0], probs[0][1], probs[0][2]))
 
-    if result == 0:
-        lights_on += 1
-    elif result == 1:
-        turn_off += 1
+    if result == 0 and probs[0][result] > 0.8:
+        print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
+        #subprocess.run(on, shell=True) # triggers the wemo swithces
+    elif result == 1 and probs[0][result] > 0.8:
+        print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
+        #subprocess.run(off, shell=True) # triggers the wemo swithces
     else:
-        silence += 1
-    POOL += 1
-    if POOL == 4:
-        if lights_on in (2,3,4):
-            print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-            #subprocess.run(on, shell=True) # triggers the wemo swithces
-        elif turn_off in (2,3,4): # and probs[0][result] > 0.7:
-            print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
-            #subprocess.run(off, shell=True) # triggers the wemo swithces
-        else:
-            print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
-        POOL = 0
-        lights_on = 0
-        turn_off = 0
-        silence = 0
+        print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
+
+    # if result == 0 and probs[0][result] > 0.5:
+    #     lights_on += 1
+    # elif result == 1 and probs[0][result] > 0.5:
+    #     turn_off += 1
+    # else:
+    #     silence += 1
+    # POOL += 1
+    # if POOL == 4:
+    #     print(lights_on, turn_off, silence)
+    #     if lights_on in (2,3,4) and turn_off in (0,1):
+    #         print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
+    #         #subprocess.run(on, shell=True) # triggers the wemo swithces
+    #     elif turn_off in (2,3,4) and lights_on in (0,1): # and probs[0][result] > 0.7:
+    #         print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
+    #         #subprocess.run(off, shell=True) # triggers the wemo swithces
+    #     else:
+    #         print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
+    #     POOL = 0
+    #     lights_on = 0
+    #     turn_off = 0
+    #     silence = 0
     # if ans ==  # and probs[0][result] > 0.9:
     #     print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
     #     subprocess.run(on, shell=True) # triggers the wemo swithces

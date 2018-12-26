@@ -15,30 +15,25 @@ elif sys.version_info.major == 2:
 # globals ########################
 g_iter = 0
 file_i = 0
+label_counter_1 = 0
+label_counter_2 = 0
 sample_data = []
 ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
 start = 0
+LABELS = ['lights-on', 'turn-off']
  
 # Path vars #####################
 ROOT = os.getcwd()
-STREAM_ROOT = os.getcwd() + "/stream_files/"
+
 
 # trying to make stream_window faster so we don't get duplicate data, 
 # but wonder if it is the problem at all though.
 # needs testing.
 
 def record_to_file(*args):
-    # global checker_value_1
-    # global checker_value_2
-    # global checker_value_3
-    
-    # if args[2] != checker_value_1 and args[2] != checker_value_2 and args[2] != checker_value_3:
     textfile.write(str(time.time()) + ",")
     textfile.write(",".join(str(x) for x in args))
     textfile.write("\n")
-    # checker_value_3 = checker_value_2
-    # checker_value_2 = checker_value_1
-    # checker_value_1 = args[2]
 
 # Save recording, clean exit from record mode
 def close_file(*args):
@@ -47,28 +42,41 @@ def close_file(*args):
     sys.exit(0)
 
 def stream_window(*args):
-    global g_iter, file_i, start
+    global g_iter, file_i, start, label_counter_1, label_counter_2
     global ch1_data, ch2_data, ch3_data, ch4_data
-    if g_iter == 0 and file_i % 2 == 0:
+    if file_i % 2 == 0:
+        flag = 1
+    else:
+        flag = 0
+
+    if g_iter == 0 and flag == 1:
         print(colored("#" * 21 + "\n" + 
                         "#" * 21 + "\n" + 
-                        "    Say command : \n" +
+                        "    TURN OFF \n" +
                         "#" * 21 + "\n" +
                         "#" * 21, 'yellow'))
-    ch1_data.append(args[1])
-    ch2_data.append(args[2])
-    ch3_data.append(args[3])
-    ch4_data.append(args[4])
+    elif g_iter == 0 and flag == 0:
+        print(colored("#" * 21 + "\n" + 
+                        "#" * 21 + "\n" + 
+                        "    LIGHTS ON \n" +
+                        "#" * 21 + "\n" +
+                        "#" * 21, 'green'))
+    ch1_data.append(round(args[2],2))
+    ch2_data.append(round(args[3],2))
+    ch3_data.append(round(args[4],2))
+    ch4_data.append(round(args[5],2))
     g_iter += 1
-    if file_i == 10: # the number of files until it overwrites the first one.
-        file_i = 0
     if g_iter == 400: # number of lines of data until packed into a txt file.
         df = pd.DataFrame(np.column_stack([ch1_data, ch2_data, ch3_data, ch4_data]), 
             columns=['ch1', 'ch2', 'ch3', 'ch4'])
-        if file_i % 2 == 0:
-            df.to_csv(STREAM_ROOT + str(file_i) + ".txt", ",")
-            print(max(df['ch2']))
-            print("Produced csv no: {}".format(file_i))
+        if flag == 0:
+            df.to_csv(args[1][0] + "/lights-on/" + str(label_counter_1) + ".txt", ",")
+            label_counter_1 += 1
+            print("Produced csv no: {} lable: lights-on".format(file_i))
+        elif flag == 1:
+            df.to_csv(args[1][0] + "/turn-off/" + str(label_counter_2) + ".txt", ",")
+            label_counter_2 += 1
+            print("Produced csv no: {} label: turn-off".format(file_i))
         file_i += 1
         g_iter = 0
         ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
@@ -89,6 +97,9 @@ if __name__ == "__main__":
     parser.add_argument("--option",
         default="print",
         help="Debugger option")
+    parser.add_argument("--fname",
+        default=None,
+        help="folder name")
     args = parser.parse_args()
 
     if sys.version_info.major == 3:
@@ -99,19 +110,23 @@ if __name__ == "__main__":
             dispatcher.map("/openbci", print_message)
             signal.signal(signal.SIGINT, exit_print)
 
-        elif args.option=="record":
-            i = 0
-            while os.path.exists("osc_record/osc_test%s.txt" % i):
-                i += 1
-            filename = "osc_record/osc_test%i.txt" % i
-            textfile = open(filename, "w")
-            textfile.write("time,address,ch1,ch2,ch3,ch4\n")
-            print("Recording to %s" % filename)
-            dispatcher.map("/openbci", record_to_file)
-            signal.signal(signal.SIGINT, close_file)
+        # elif args.option=="record":
+        #     i = 0
+        #     while os.path.exists("osc_record/osc_test%s.txt" % i):
+        #         i += 1
+        #     filename = "osc_record/osc_test%i.txt" % i
+        #     textfile = open(filename, "w")
+        #     textfile.write("time,address,ch1,ch2,ch3,ch4\n")
+        #     print("Recording to %s" % filename)
+        #     dispatcher.map("/openbci", record_to_file)
+        #     signal.signal(signal.SIGINT, close_file)
         
-        elif args.option=="predict":
-            dispatcher.map("/openbci", stream_window)
+        elif args.option=="record":
+            dir_path = os.path.join(os.getcwd(), "osc_data", args.fname)
+            os.mkdir(dir_path)
+            for label in LABELS:
+                os.mkdir(os.path.join(dir_path, label))
+            dispatcher.map("/openbci", stream_window, dir_path)
             signal.signal(signal.SIGINT, exit_print)
 
         # Display server attributes
