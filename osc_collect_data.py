@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from osc_helper import *
 import signal
-from termcolor import colored
+from colored import fg, attr
 if sys.version_info.major == 3:
     from pythonosc import dispatcher
     from pythonosc import osc_server
@@ -14,72 +14,84 @@ elif sys.version_info.major == 2:
 
 # globals ########################
 g_iter = 0
-file_i = 0
-label_counter_1 = 0
-label_counter_2 = 0
+file_iter = 0
+label_iter = 0
 sample_data = []
-ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
-start = 0
-LABELS = ['lights-on', 'turn-off']
+
+# CH_NAME = list(CH_DATA.keys())
+
+CHANNELS = ['ch1', 'ch2', 'ch3', 'ch4']
+CH_DATA = {ch: [] for ch in CHANNELS}
+NB_CHANNELS = len(CH_DATA.keys())
+
+LABELS = ['zero', 'one', 'two', 'three', 'four', 
+            'five', 'six', 'seven', 'eight', 'nine',
+            'left', 'right', 'stop', 'go', 'up', 
+            'down']
+LABEL_COUNT = {label:0 for label in LABELS}
+NB_LABELS = len(LABELS)
+
+COLORS = ['red', 'green', 'yellow', 'blue', 'magenta', 
+            'cyan', 'white', 'light_gray', 'light_red', 'light_green',
+            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'orange_4a', 
+            'grey_37']
+INTERVAL = 1.5 # seconds to record of each label
  
 # Path vars #####################
 ROOT = os.getcwd()
-
 
 # trying to make stream_window faster so we don't get duplicate data, 
 # but wonder if it is the problem at all though.
 # needs testing.
 
-def record_to_file(*args):
-    textfile.write(str(time.time()) + ",")
-    textfile.write(",".join(str(x) for x in args))
-    textfile.write("\n")
-
 # Save recording, clean exit from record mode
-def close_file(*args):
-    print("\nFILE SAVED")
-    textfile.close()
-    sys.exit(0)
+# def close_file(*args):
+#     print("\nFILE SAVED")
+#     textfile.close()
+#     sys.exit(0)
+
+def output_command(s_label, color):
+    color = fg(color)
+    reset = attr('reset')
+    print(color + 
+            "#" * 42 + "\n" + 
+            "#" * 42 + "\n" + 
+            "    {} \n".format(s_label) +
+            "#" * 42 + "\n" +
+            "#" * 42 +
+            reset)
+
+def dframe2csv(csv_path):
+    global LABEL_COUNT
+    global label_iter
+    
+    df = pd.DataFrame(CH_DATA)
+    label = LABELS[label_iter]
+    df.to_csv(csv_path + "/{}/".format(label) + str(LABEL_COUNT[label]) + ".txt", ",")
+    print("Produced csv no: {} lable: {}".format(file_iter, label))
+    LABEL_COUNT[label] += 1 
+    if label_iter == NB_LABELS - 1:
+        label_iter = 0
+    else:
+        label_iter += 1
+  
 
 def stream_window(*args):
-    global g_iter, file_i, start, label_counter_1, label_counter_2
-    global ch1_data, ch2_data, ch3_data, ch4_data
-    if file_i % 2 == 0:
-        flag = 1
-    else:
-        flag = 0
+    global g_iter, file_iter, label_iter
+    global CH_DATA
 
-    if g_iter == 0 and flag == 1:
-        print(colored("#" * 21 + "\n" + 
-                        "#" * 21 + "\n" + 
-                        "    TURN OFF \n" +
-                        "#" * 21 + "\n" +
-                        "#" * 21, 'yellow'))
-    elif g_iter == 0 and flag == 0:
-        print(colored("#" * 21 + "\n" + 
-                        "#" * 21 + "\n" + 
-                        "    LIGHTS ON \n" +
-                        "#" * 21 + "\n" +
-                        "#" * 21, 'green'))
-    ch1_data.append(round(args[2],2))
-    ch2_data.append(round(args[3],2))
-    ch3_data.append(round(args[4],2))
-    ch4_data.append(round(args[5],2))
+    if g_iter == 0:
+        output_command(LABELS[label_iter], COLORS[label_iter])
+
+    for x in range(1, NB_CHANNELS + 1):
+        CH_DATA['ch{}'.format(x)].append(round(args[x + 1], 2))
+
     g_iter += 1
-    if g_iter == 400: # number of lines of data until packed into a txt file.
-        df = pd.DataFrame(np.column_stack([ch1_data, ch2_data, ch3_data, ch4_data]), 
-            columns=['ch1', 'ch2', 'ch3', 'ch4'])
-        if flag == 0:
-            df.to_csv(args[1][0] + "/lights-on/" + str(label_counter_1) + ".txt", ",")
-            label_counter_1 += 1
-            print("Produced csv no: {} lable: lights-on".format(file_i))
-        elif flag == 1:
-            df.to_csv(args[1][0] + "/turn-off/" + str(label_counter_2) + ".txt", ",")
-            label_counter_2 += 1
-            print("Produced csv no: {} label: turn-off".format(file_i))
-        file_i += 1
+    if g_iter == 200 * INTERVAL: # number of lines of data until packed into a txt file.
+        dframe2csv(args[1][0])
         g_iter = 0
-        ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
+        CH_DATA = {ch: [] for ch in CHANNELS}
+        file_iter += 1
 
 if __name__ == "__main__":
 # Collect command line arguments

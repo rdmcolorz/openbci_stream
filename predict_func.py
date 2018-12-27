@@ -33,6 +33,7 @@ OUTPUT = os.getcwd() + "/predict.csv"
 paths = {
     "vocal": ROOT+"/models/vocal_model",
     "subvocal": ROOT + "/models/subvocal_model",
+    "both": ROOT + "/models/both_model"
 }
 DEFAULT_BS = 1
 
@@ -75,12 +76,12 @@ def predict(model):
     result = classes[0]
     print("lights-on :{:f}, turn-off : {:f}, silence : {:f}".format(probs[0][0], probs[0][1], probs[0][2]))
 
-    if result == 0 and probs[0][result] > 0.8:
+    if result == 0: # and probs[0][result] > 0.7:
         print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))
-        #subprocess.run(on, shell=True) # triggers the wemo swithces
-    elif result == 1 and probs[0][result] > 0.8:
+        subprocess.run(on, shell=True) # triggers the wemo swithces
+    elif result == 1: # and probs[0][result] > 0.7:
         print(colored("-" * 21 + "\n     Turned OFF!\n" + "-" * 21, 'yellow'))
-        #subprocess.run(off, shell=True) # triggers the wemo swithces
+        subprocess.run(off, shell=True) # triggers the wemo swithces
     else:
         print(colored("-" * 21 + "\n..... Silence .....\n" + "-" * 21, 'red'))
 
