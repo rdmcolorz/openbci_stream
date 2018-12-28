@@ -31,10 +31,10 @@ LABELS = ['zero', 'one', 'two', 'three', 'four',
 LABEL_COUNT = {label:0 for label in LABELS}
 NB_LABELS = len(LABELS)
 
-COLORS = ['red', 'green', 'yellow', 'blue', 'magenta', 
+COLORS = ['red', 'green', 'yellow', 'light_blue', 'magenta', 
             'cyan', 'white', 'light_gray', 'light_red', 'light_green',
-            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'orange_4a', 
-            'grey_37']
+            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'orange', 
+            'yellow']
 INTERVAL = 1.5 # seconds to record of each label
  
 # Path vars #####################
