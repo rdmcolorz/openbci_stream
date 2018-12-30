@@ -33,7 +33,7 @@ NB_LABELS = len(LABELS)
 
 COLORS = ['red', 'green', 'yellow', 'light_blue', 'magenta', 
             'cyan', 'white', 'light_gray', 'light_red', 'light_green',
-            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'orange', 
+            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'light_blue', 
             'yellow']
 INTERVAL = 1.5 # seconds to record of each label
  
@@ -74,7 +74,6 @@ def dframe2csv(csv_path):
         label_iter = 0
     else:
         label_iter += 1
-  
 
 def stream_window(*args):
     global g_iter, file_iter, label_iter
@@ -97,49 +96,33 @@ if __name__ == "__main__":
 # Collect command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
-        default="localhost", 
-        help="The ip to listen on")
+                        default="localhost", 
+                        help="The ip to listen on")
     parser.add_argument("--port",
-        type=int, 
-        default=12345, 
-        help="The port to listen on")
+                        type=int, 
+                        default=12345, 
+                        help="The port to listen on")
     parser.add_argument("--address",
-        default="/openbci", 
-        help="address to listen to")
+                        default="/openbci", 
+                        help="address to listen to")
     parser.add_argument("--option",
-        default="print",
-        help="Debugger option")
+                        default="print",
+                        help="Debugger option")
     parser.add_argument("--fname",
-        default=None,
-        help="folder name")
+                        default=None,
+                        help="folder name")
     args = parser.parse_args()
 
     if sys.version_info.major == 3:
     # Set up necessary parameters from command line
         dispatcher = dispatcher.Dispatcher()
         
-        if args.option=="print":
-            dispatcher.map("/openbci", print_message)
-            signal.signal(signal.SIGINT, exit_print)
-
-        # elif args.option=="record":
-        #     i = 0
-        #     while os.path.exists("osc_record/osc_test%s.txt" % i):
-        #         i += 1
-        #     filename = "osc_record/osc_test%i.txt" % i
-        #     textfile = open(filename, "w")
-        #     textfile.write("time,address,ch1,ch2,ch3,ch4\n")
-        #     print("Recording to %s" % filename)
-        #     dispatcher.map("/openbci", record_to_file)
-        #     signal.signal(signal.SIGINT, close_file)
-        
-        elif args.option=="record":
-            dir_path = os.path.join(os.getcwd(), "osc_data", args.fname)
-            os.mkdir(dir_path)
-            for label in LABELS:
-                os.mkdir(os.path.join(dir_path, label))
-            dispatcher.map("/openbci", stream_window, dir_path)
-            signal.signal(signal.SIGINT, exit_print)
+        dir_path = os.path.join(os.getcwd(), "osc_data", args.fname)
+        os.mkdir(dir_path)
+        for label in LABELS:
+            os.mkdir(os.path.join(dir_path, label))
+        dispatcher.map("/openbci", stream_window, dir_path)
+        signal.signal(signal.SIGINT, exit_print)
 
         # Display server attributes
         print('--------------------')

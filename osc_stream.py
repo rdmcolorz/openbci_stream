@@ -16,7 +16,10 @@ elif sys.version_info.major == 2:
 g_iter = 0
 file_i = 0
 sample_data = []
-ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
+CHANNELS = ['ch1', 'ch2', 'ch3', 'ch4']
+CH_DATA = {ch: [] for ch in CHANNELS}
+NB_CHANNELS = len(CH_DATA.keys())
+INTERVAL = 2 # seconds to record of each label
 start = 0
  
 # Path vars #####################
@@ -55,23 +58,22 @@ def stream_window(*args):
                         "    Say command : \n" +
                         "#" * 21 + "\n" +
                         "#" * 21, 'yellow'))
-    ch1_data.append(args[1])
-    ch2_data.append(args[2])
-    ch3_data.append(args[3])
-    ch4_data.append(args[4])
+
+    for x in range(1, NB_CHANNELS + 1):
+        CH_DATA['ch{}'.format(x)].append(round(args[x], 2))
+
     g_iter += 1
     if file_i == 10: # the number of files until it overwrites the first one.
         file_i = 0
-    if g_iter == 400: # number of lines of data until packed into a txt file.
-        df = pd.DataFrame(np.column_stack([ch1_data, ch2_data, ch3_data, ch4_data]), 
-            columns=['ch1', 'ch2', 'ch3', 'ch4'])
+    if g_iter == 200 * INTERVAL: # number of lines of data until packed into a txt file.
+        df = pd.DataFrame(CH_DATA)
         if file_i % 2 == 0:
             df.to_csv(STREAM_ROOT + str(file_i) + ".txt", ",")
             print(max(df['ch2']))
             print("Produced csv no: {}".format(file_i))
         file_i += 1
         g_iter = 0
-        ch1_data, ch2_data, ch3_data, ch4_data  = [], [], [], []
+        CH_DATA = {ch: [] for ch in CHANNELS}
 
 if __name__ == "__main__":
 # Collect command line arguments
