@@ -16,12 +16,12 @@ and then rewrites them.
 #### Additional parameters
 - `--option` 
   - `print` : prints the data streaming from the device.
-  - `record` : records the data from the device to a txt file
   - `predict` : runs the data through a CNN model and predicts what the data means. (ex: 'yes' or 'no')
 
-#### `convert_image.py`
-- Run this code to grab data from the chunks `osc_stream.py` outputs, and stiches 10 files together to produce a second of data
-OpenBCI transfers to the macbook through BLE (sample rate : 200hz).
-- Need to delete the `downsampled` folder to start running this code since the command `ffmpg` stops running when there are already files 
-in the directory, will try to fix this next. While running the code `downsampled` will delete itself when done predicting so the code
-will keep running.
+#### 'osc_collect_data.py'
+- This scripts works by outputting the label it is currently recording onto the terminal, and records for a fixed duration.
+- Once the user sees the output on the terminal, he/she should make the gesture according to the lable.
+
+#### Additional parameters
+- `--option`
+    - `fname` : default output directory will be the current time, if you want to change it you can name it with this option.
