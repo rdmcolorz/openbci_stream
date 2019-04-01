@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from osc_helper import *
 import signal
+import datetime
 from colored import fg, attr
 if sys.version_info.major == 3:
     from pythonosc import dispatcher
@@ -39,16 +40,6 @@ INTERVAL = 1.5 # seconds to record of each label
  
 # Path vars #####################
 ROOT = os.getcwd()
-
-# trying to make stream_window faster so we don't get duplicate data, 
-# but wonder if it is the problem at all though.
-# needs testing.
-
-# Save recording, clean exit from record mode
-# def close_file(*args):
-#     print("\nFILE SAVED")
-#     textfile.close()
-#     sys.exit(0)
 
 def output_command(s_label, color):
     color = fg(color)
@@ -101,16 +92,13 @@ if __name__ == "__main__":
     parser.add_argument("--port",
                         type=int, 
                         default=12345, 
-                        help="The port to listen on")
+                        help="The port to listen on, default=12345")
     parser.add_argument("--address",
                         default="/openbci", 
-                        help="address to listen to")
-    parser.add_argument("--option",
-                        default="print",
-                        help="Debugger option")
+                        help="address to listen to, default=/openbci")
     parser.add_argument("--fname",
-                        default=None,
-                        help="folder name")
+                        default=str(datetime.datetime.now())[:-7],
+                        help="folder name, default=current time")
     args = parser.parse_args()
 
     if sys.version_info.major == 3:
@@ -132,7 +120,6 @@ if __name__ == "__main__":
         print("PORT:", args.port)
         print("ADDRESS:", args.address)
         print('--------------------')
-        print("%s option selected" % args.option)
 
         # connect server
         server = osc_server.BlockingOSCUDPServer(

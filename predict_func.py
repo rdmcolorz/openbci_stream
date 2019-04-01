@@ -68,6 +68,7 @@ def predict(model):
 
     # Create the Estimator
     classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths[model])
+    
     # Create the input functions.
     demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
