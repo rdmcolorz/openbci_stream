@@ -15,10 +15,10 @@ and then rewrites them.
 
 #### Additional parameters
 - `--option` 
-  - `print` : prints the data streaming from the device.
-  - `predict` : runs the data through a CNN model and predicts what the data means. (ex: 'yes' or 'no')
+  - `print` : prints the data streaming from the device. Mainly used for checking the connection between the GUI and OSC.
+  - `predict` : records a fixed interval and runs the data through a pre-trained model and predicts what the data corresponds to. (ex: 'yes' or 'no')
 
-#### 'osc_collect_data.py'
+#### `osc_collect_data.py`
 - This scripts works by outputting the label it is currently recording onto the terminal, and records for a fixed duration.
 - Once the user sees the output on the terminal, he/she should make the gesture according to the lable.
 
