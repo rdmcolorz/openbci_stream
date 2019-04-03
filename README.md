@@ -9,6 +9,13 @@ We are using OpenBCI Ganglion to collect data with its GUI networking widget and
 
 - Device used: [OpenBCI Ganglion](http://docs.openbci.com/Tutorials/02-Ganglion_Getting%20Started_Guide)
 
+
+#### setup for data collection
+Install required modules:
+- `pip install -r requirements.txt`
+Create required directories:
+- `python setup.py`
+
 #### `osc_stream.py`
 - Reads in the OpenBCI from the OSC server, takes 20 data points and converts them to csv files continuously up to 30 files,
 and then rewrites them.
