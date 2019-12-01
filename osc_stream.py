@@ -13,8 +13,8 @@ elif sys.version_info.major == 2:
 #tf.logging.set_verbosity(tf.logging.ERROR)
 
 # globals ########################
-g_iter = 0
-file_iter = 0
+ITER = 0
+FILE_ITER = 0
 CHANNELS = ['ch1', 'ch2', 'ch3', 'ch4']
 CH_DATA = {ch: [] for ch in CHANNELS}
 NB_CHANNELS = len(CH_DATA.keys())
@@ -50,10 +50,10 @@ def output_command(s_label, color):
             reset)
 
 def stream_window(*args):
-    global g_iter, file_iter
+    global ITER, FILE_ITER
     global CH_DATA
 
-    if g_iter == 0 and file_iter % 2 == 0:
+    if ITER == 0 and FILE_ITER % 2 == 0:
         print(colored("#" * 21 + "\n" + 
                         "#" * 21 + "\n" + 
                         "    Say command : \n" +
@@ -64,14 +64,14 @@ def stream_window(*args):
         CH_DATA['ch{}'.format(x)].append(round(args[x], 2))
 
     g_iter += 1
-    if file_iter == 10: # the number of files until it overwrites the first one.
-        file_iter = 0
+    if FILE_ITER == 10: # the number of files until it overwrites the first one.
+        FILE_ITER = 0
     if g_iter == 200 * INTERVAL: # number of lines of data until packed into a txt file.
         df = pd.DataFrame(CH_DATA)
-        if file_iter % 2 == 0:
-            df.to_csv(STREAM_ROOT + str(file_iter) + ".txt", ",")
-            print("Produced csv no: {}".format(file_iter))
-        file_iter += 1
+        if FILE_ITER % 2 == 0:
+            df.to_csv(STREAM_ROOT + str(FILE_ITER) + ".txt", ",")
+            print("Produced csv no: {}".format(FILE_ITER))
+        FILE_ITER += 1
         g_iter = 0
         CH_DATA = {ch: [] for ch in CHANNELS}
 
