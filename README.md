@@ -3,8 +3,8 @@
 We are using OpenBCI Ganglion to collect data with its GUI networking widget and uses OSC to stream data, capturing EMG signals from the vocal cords and translating it to words and sentences.
 
 We modeled and 3D printed a neckpiece to locate the placement of electrodes.
-<img src="markdownmonstericon.png"
-     alt="Markdown Monster icon"
+<img src="/imgs/neck_piece_model.png"
+     alt="neck piece"
      style="height: 50%; width: 50%; margin-right: 10px;" />
 
 - Uses the python-osc library to communicate with the OpenBCI device.
