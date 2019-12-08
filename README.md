@@ -4,7 +4,7 @@ We are using OpenBCI Ganglion to collect data with its GUI networking widget and
 
 We modeled and 3D printed a neckpiece to locate the placement of electrodes. ![neck piece](imgs/neck_piece_model.png)
 
-Version 1 rig for data collection, where we used a audio interface and 
+Version 1 rig for data collection, where we used a audio interface and self-made electrode holders for data collection. ![v1_rig](imgs/version1_rig.jpg)
 
 [Video](https://www.youtube.com/watch?v=sHNEoIGQpKE) introduction about the project setup, data collection proecess, and demo use. 
 
