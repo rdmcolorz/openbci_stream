@@ -2,7 +2,9 @@
 
 We are using OpenBCI Ganglion to collect data with its GUI networking widget and uses OSC to stream data, capturing EMG signals from the vocal cords and translating it to words and sentences.
 
-We modeled and 3D printed a neckpiece to locate the placement of electrodes. ![neck piece](imgs/neck_piece_model.png =250x)
+We modeled and 3D printed a neckpiece to locate the placement of electrodes. ![neck piece](imgs/neck_piece_model.png)
+
+Video introduction about the project setup, data collection proecess, and demo use. [Video](https://www.youtube.com/watch?v=sHNEoIGQpKE)
 
 - Uses the python-osc library to communicate with the OpenBCI device.
 - Since I'm using synchronous streaming, which is not the most optimal way to stream data, but what I want to do is to get it to work first without losing any data from the device.
