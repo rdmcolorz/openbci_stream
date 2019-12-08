@@ -2,30 +2,28 @@
 
 We are using OpenBCI Ganglion to collect data with its GUI networking widget and uses OSC to stream data, capturing EMG signals from the vocal cords and translating it to words and sentences.
 
-We modeled and 3D printed a neckpiece to locate the placement of electrodes.
-<img src="/imgs/neck_piece_model.png"
-     alt="neck piece"
-     style="height: 200;" />
+We modeled and 3D printed a neckpiece to locate the placement of electrodes. ![neck piece](imgs/neck_piece_model.png)
 
-Below is a sample recording of electrode placement for data collection.
-<img src="/imgs/me_electrodes.png"
-     alt="placement"
-     style="height: 200;" />
+Version 1 rig for data collection, where we used a audio interface and 
 
-Collecting Data scenario.
-<img src="/imgs/collecting_data.png"
-     alt="placement"
-     style="height: 200;" />
+[Video](https://www.youtube.com/watch?v=sHNEoIGQpKE) introduction about the project setup, data collection proecess, and demo use. 
+>>>>>>> 3c94fc7faedde06ca0449c78774736e758ffcca0
 
 - Uses the python-osc library to communicate with the OpenBCI device.
 - This version is using synchronous streaming, which is not the most optimal way to stream data, but what I want to do is to get it to work first without losing any data from the device.
 
 - While using the python-osc library, had a problem where I was getting duplicate data from the device, and after I restart the OpenBCI GUI, the data would stream properly, so reminder is to restart the GUI whenever you want to stream or record data.
 
-- Device used: [OpenBCI Ganglion](http://docs.openbci.com/Tutorials/02-Ganglion_Getting%20Started_Guide)
+## Software
+- Autodesk Recap: [Recap](https://www.autodesk.com/products/recap/features) Using images to create 3D models. We had a person sit in a chair and circled around the person taking around 50 photos and stitching them together in Recap.
+
+## Hardware
+- Bio Sensing Tool for EMG/EEG used: [OpenBCI Ganglion](http://docs.openbci.com/Tutorials/02-Ganglion_Getting%20Started_Guide)
+- Electrodes: [3M surface electrodes]( https://www.amazon.com/Red-Dot-Multi-Purpose-Monitoring-Electrode/dp/B01AME7YC0/ref=sxts_sxwds-bia?keywords=3m+electrodes&pd_rd_i=B01AME7YC0&pd_rd_r=ac7163a4-9ddb-48be-bcf7-5ddab0b5c801&pd_rd_w=THwiB&pd_rd_wg=rq0Jg&pf_rd_p=1cb3f32a-ccfd-479b-8a13-b22f56c942c6&pf_rd_r=Y72D06NDW0E7GSNPT1EC&psc=1&qid=1575842343)
+- Simple self-made EMG sensing circuit using op-amps. ![circuit]()
 
 
-#### setup for data collection
+## setup for data collection
 - Make sure to use python 3.6 and above
 - Install required modules:
     - `pip install -r requirements.txt`
