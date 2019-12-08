@@ -5,10 +5,20 @@ We are using OpenBCI Ganglion to collect data with its GUI networking widget and
 We modeled and 3D printed a neckpiece to locate the placement of electrodes.
 <img src="/imgs/neck_piece_model.png"
      alt="neck piece"
-     style="height: 200; width: ; margin-right: 10px;" />
+     style="height: 200;" />
+
+Below is a sample recording of electrode placement for data collection.
+<img src="/imgs/me_electrodes.png"
+     alt="placement"
+     style="height: 200;" />
+
+Collecting Data scenario.
+<img src="/imgs/collecting_data.png"
+     alt="placement"
+     style="height: 200;" />
 
 - Uses the python-osc library to communicate with the OpenBCI device.
-- Since I'm using synchronous streaming, which is not the most optimal way to stream data, but what I want to do is to get it to work first without losing any data from the device.
+- This version is using synchronous streaming, which is not the most optimal way to stream data, but what I want to do is to get it to work first without losing any data from the device.
 
 - While using the python-osc library, had a problem where I was getting duplicate data from the device, and after I restart the OpenBCI GUI, the data would stream properly, so reminder is to restart the GUI whenever you want to stream or record data.
 
@@ -33,7 +43,7 @@ and then rewrites them.
 
 #### `osc_collect_data.py`
 - This scripts works by outputting the label it is currently recording onto the terminal, and records for a fixed duration.
-- Once the user sees the output on the terminal, he/she should make the gesture according to the lable.
+- Once the user sees the output on the terminal, he/she should make the gesture according to the label.
 
 #### Additional parameters
 - `--option`

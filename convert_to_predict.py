@@ -14,6 +14,9 @@ import time
 import atexit
 
 # Vars ###########
+"""TODO: CHx_MAX is used for normalizing each channel values, which is taken
+from the highest data point within the whole training set, this isn't a
+consistant variable, should look for alternatie ways"""
 CH1_MAX = 270
 CH2_MAX = 270
 CH3_MAX = 220
@@ -25,6 +28,7 @@ AUDIO = os.getcwd() + "/latest_wav/"
 IMG = os.getcwd() + "/latest_spec/"
 
 def latest_txt_files(path,qty):
+    """helps """
     files = os.listdir(path)
     paths = [os.path.join(path, basename) for basename in files if basename.endswith(".txt")]
     s_paths = sorted(paths, key=os.path.getctime, reverse=True)
@@ -73,21 +77,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model",
         default="vocal", 
-        help="The type of model, vocal for voice, subvocal for subvocal")
+        help="The type of model, use <vocal> for vocal, <subvocal> for subvocal")
     args = parser.parse_args()
 
     while (True):
-        #print(colored("-" * 21 + "\nSay command : \n" + "-" * 21, 'white'))
         fls=latest_txt_files(STREAM_FILES,1)
         print(fls[0])
         list_ = []
-        #print(fls)
         for file_ in fls:
             df = pd.read_csv(file_,index_col=None, header=0)
             list_.append(df)
             
         frame = pd.concat(list_, axis = 0, ignore_index = True)
-        # need to be replace with constants obtained from main data
+        # TODO: need to be replace with constants obtained from main data
 
         for channel in range(1, NB_CHANNELS + 1):
             ch_name = 'ch{}'.format(channel)
