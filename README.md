@@ -7,7 +7,6 @@ We modeled and 3D printed a neckpiece to locate the placement of electrodes. ![n
 Version 1 rig for data collection, where we used a audio interface and 
 
 [Video](https://www.youtube.com/watch?v=sHNEoIGQpKE) introduction about the project setup, data collection proecess, and demo use. 
->>>>>>> 3c94fc7faedde06ca0449c78774736e758ffcca0
 
 - Uses the python-osc library to communicate with the OpenBCI device.
 - This version is using synchronous streaming, which is not the most optimal way to stream data, but what I want to do is to get it to work first without losing any data from the device.
@@ -20,7 +19,7 @@ Version 1 rig for data collection, where we used a audio interface and
 ## Hardware
 - Bio Sensing Tool for EMG/EEG used: [OpenBCI Ganglion](http://docs.openbci.com/Tutorials/02-Ganglion_Getting%20Started_Guide)
 - Electrodes: [3M surface electrodes]( https://www.amazon.com/Red-Dot-Multi-Purpose-Monitoring-Electrode/dp/B01AME7YC0/ref=sxts_sxwds-bia?keywords=3m+electrodes&pd_rd_i=B01AME7YC0&pd_rd_r=ac7163a4-9ddb-48be-bcf7-5ddab0b5c801&pd_rd_w=THwiB&pd_rd_wg=rq0Jg&pf_rd_p=1cb3f32a-ccfd-479b-8a13-b22f56c942c6&pf_rd_r=Y72D06NDW0E7GSNPT1EC&psc=1&qid=1575842343)
-- Simple self-made EMG sensing circuit using op-amps. ![circuit]()
+- Simple self-made EMG sensing circuit using op-amps. ![circuit](imgs/op-amp-circuit.png)
 
 
 ## setup for data collection
