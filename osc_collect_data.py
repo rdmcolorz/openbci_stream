@@ -1,16 +1,20 @@
-import argparse, time, os, sys
+import argparse
+import time
+import os
+import sys
+import datetime
+
 import pandas as pd
 import numpy as np
-from osc_helper import *
 import signal
-import datetime
 from colored import fg, attr
-
 if sys.version_info.major == 3:
     from pythonosc import dispatcher
     from pythonosc import osc_server
 elif sys.version_info.major == 2:
     import OSC
+
+from osc_helper import print_message, exit_print
 
 #tf.logging.set_verbosity(tf.logging.ERROR)
 
@@ -26,17 +30,21 @@ CHANNELS = ['ch1', 'ch2', 'ch3', 'ch4']
 CH_DATA = {ch: [] for ch in CHANNELS}
 NB_CHANNELS = len(CH_DATA.keys())
 
-LABELS = ['zero', 'one', 'two', 'three', 'four', 
-            'five', 'six', 'seven', 'eight', 'nine',
-            'left', 'right', 'stop', 'go', 'up', 
-            'down']
+LABELS = [
+        'zero', 'one', 'two', 'three', 'four', 
+        'five', 'six', 'seven', 'eight', 'nine',
+        'left', 'right', 'stop', 'go', 'up', 
+        'down'
+        ]
 LABEL_COUNT = {label:0 for label in LABELS}
 NB_LABELS = len(LABELS)
 
-COLORS = ['red', 'green', 'yellow', 'light_blue', 'magenta', 
-            'cyan', 'white', 'light_gray', 'light_red', 'light_green',
-            'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'light_blue', 
-            'yellow']
+COLORS = [
+        'red', 'green', 'yellow', 'light_blue', 'magenta', 
+        'cyan', 'white', 'light_gray', 'light_red', 'light_green',
+        'light_yellow', 'cyan_3', 'green_3b', 'blue_violet', 'light_blue', 
+        'yellow'
+        ]
 INTERVAL = 1.5 # seconds to record of each label
  
 # Path vars #####################
@@ -51,7 +59,8 @@ def output_command(s_label, color):
             "    {} \n".format(s_label) +
             "#" * 42 + "\n" +
             "#" * 42 +
-            reset)
+            reset
+            )
 
 def dframe2csv(csv_path):
     global LABEL_COUNT
@@ -59,7 +68,12 @@ def dframe2csv(csv_path):
     
     df = pd.DataFrame(CH_DATA)
     label = LABELS[label_iter]
-    df.to_csv(csv_path + "/{}/".format(label) + str(LABEL_COUNT[label]) + ".txt", ",")
+    df.to_csv(
+                csv_path 
+                + "/{}/".format(label) 
+                + str(LABEL_COUNT[label]) 
+                + ".txt", ","
+                )
     print("Produced csv no: {} lable: {}".format(file_iter, label))
     LABEL_COUNT[label] += 1 
     if label_iter == NB_LABELS - 1:
@@ -78,7 +92,8 @@ def stream_window(*args):
         CH_DATA['ch{}'.format(x)].append(round(args[x + 1], 2))
 
     g_iter += 1
-    if g_iter == 200 * INTERVAL: # number of lines of data until packed into a txt file.
+    if g_iter == 200 * INTERVAL: 
+        # number of lines of data until packed into a txt file.
         dframe2csv(args[1][0])
         g_iter = 0
         CH_DATA = {ch: [] for ch in CHANNELS}
@@ -89,17 +104,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
                         default="localhost", 
-                        help="The ip to listen on")
+                        help="The ip to listen on"
+                        )
     parser.add_argument("--port",
                         type=int, 
                         default=12345, 
-                        help="The port to listen on, default=12345")
+                        help="The port to listen on, default=12345"
+                        )
     parser.add_argument("--address",
                         default="/openbci", 
-                        help="address to listen to, default=/openbci")
+                        help="address to listen to, default=/openbci"
+                        )
     parser.add_argument("--fname",
                         default=str(datetime.datetime.now())[:-7],
-                        help="folder name, default=current time")
+                        help="folder name, default=current time"
+                        )
     args = parser.parse_args()
 
     if sys.version_info.major == 3:

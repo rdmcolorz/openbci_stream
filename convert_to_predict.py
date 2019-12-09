@@ -1,6 +1,10 @@
-import subprocess, argparse
-from scipy.io.wavfile import write
-import os, shutil, re
+import subprocess
+import argparse
+import os
+import shutil
+import re
+import time
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,9 +12,7 @@ from scipy import signal
 from scipy.io import wavfile
 from predict_func import predict
 import librosa
-import librosa.display
 from termcolor import colored
-import time
 import atexit
 
 # Vars ###########
@@ -28,9 +30,9 @@ AUDIO = os.getcwd() + "/latest_wav/"
 IMG = os.getcwd() + "/latest_spec/"
 
 def latest_txt_files(path,qty):
-    """helps """
     files = os.listdir(path)
-    paths = [os.path.join(path, basename) for basename in files if basename.endswith(".txt")]
+    paths = [os.path.join(path, basename) 
+                for basename in files if basename.endswith(".txt")]
     s_paths = sorted(paths, key=os.path.getctime, reverse=True)
     ss_paths = sorted(s_paths[:qty], key=os.path.getctime)
     return ss_paths
@@ -61,7 +63,10 @@ def preprocess(samples, sample_rate, multiplier=1):
 
 def make_spectrograms(samples, sample_rate, o_file_path): 
     changed = preprocess(samples, sample_rate, 1)
-    S = librosa.feature.melspectrogram(changed, sr=sample_rate, n_mels=128, fmax=512)
+    S = librosa.feature.melspectrogram(changed, 
+                                        sr=sample_rate,
+                                        n_mels=128, 
+                                        fmax=512)
     log_S = librosa.power_to_db(S, ref=np.max)
     fig = plt.figure(figsize=(1.28, 1.28), dpi=100, frameon=False)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
@@ -77,7 +82,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model",
         default="vocal", 
-        help="The type of model, use <vocal> for vocal, <subvocal> for subvocal")
+        help="Model data type, use <vocal> for vocal, <subvocal> for subvocal")
     args = parser.parse_args()
 
     while (True):

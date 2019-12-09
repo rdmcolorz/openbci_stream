@@ -1,11 +1,25 @@
-import argparse, time, atexit, signal, time
-import os, sys, subprocess, threading, shutil
+import argparse
+import time
+import time
+import os
+import sys
+import subprocess
+import threading
+import shutil
+
+import signal
+import atexit
 import pandas as pd
 #import pygame
 import tensorflow as tf
-from model_func import *
-from model_func import _parse_function
 from termcolor import colored
+
+from model_func import (_parse_function, 
+                        timer, 
+                        model_fn, 
+                        create_training_input_fn, 
+                        create_predict_input_fn
+                        )
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 
@@ -34,7 +48,7 @@ paths = {
     "vocal": ROOT+"/models/vocal_model",
     "subvocal": ROOT + "/models/subvocal_model",
     "both": ROOT + "/models/both_model"
-}
+    }
 DEFAULT_BS = 1
 
 #################################
@@ -67,15 +81,19 @@ def predict(model):
     demo_data = timer(lambda: demo_data.map(_parse_function))
 
     # Create the Estimator
-    classifier = tf.estimator.Estimator(model_fn=model_fn, model_dir=paths[model])
-    
+    classifier = tf.estimator.Estimator(model_fn=model_fn, 
+                                        model_dir=paths[model]
+                                        )
     # Create the input functions.
     demo_eval_input_fn = create_predict_input_fn(demo_data, DEFAULT_BS)
     results = [x for x in classifier.predict(input_fn=demo_eval_input_fn)]
     classes = [x["classes"] for x in results]
     probs = [x["probabilities"] for x in results]
     result = classes[0]
-    print("lights-on :{:f}, turn-off : {:f}, silence : {:f}".format(probs[0][0], probs[0][1], probs[0][2]))
+    print("lights-on :{:f}, turn-off : {:f}, silence : {:f}".format(probs[0][0], 
+                                                                    probs[0][1], 
+                                                                    probs[0][2])
+                                                                    )
 
     if result == 0: # and probs[0][result] > 0.7:
         print(colored("-" * 21 + "\n     Lights ON!\n" + "-" * 21, 'green'))

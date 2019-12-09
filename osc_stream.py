@@ -1,14 +1,19 @@
-import argparse, time, os, sys
+import argparse
+import time
+import os
+import sys
+
 import pandas as pd
 import numpy as np
-from osc_helper import *
 import signal
-from colored import fg, attr
 if sys.version_info.major == 3:
     from pythonosc import dispatcher
     from pythonosc import osc_server
 elif sys.version_info.major == 2:
     import OSC
+
+from osc_helper import print_message, exit_print
+from colored import fg, attr
 
 #tf.logging.set_verbosity(tf.logging.ERROR)
 
@@ -39,26 +44,31 @@ def close_file(*args):
     sys.exit(0)
 
 def output_command(s_label, color):
+    """function to color labels and output to terminal"""
     color = fg(color)
     reset = attr('reset')
-    print(color + 
-            "#" * 42 + "\n" + 
-            "#" * 42 + "\n" + 
-            "    {} \n".format(s_label) +
-            "#" * 42 + "\n" +
-            "#" * 42 +
-            reset)
+    print(
+        color
+        + "#" * 42 + "\n" 
+        + "#" * 42 + "\n" 
+        + "    {} \n".format(s_label)
+        + "#" * 42 + "\n" 
+        + "#" * 42 
+        + reset
+        )
 
 def stream_window(*args):
     global ITER, FILE_ITER
     global CH_DATA
 
     if ITER == 0 and FILE_ITER % 2 == 0:
-        print(colored("#" * 21 + "\n" + 
-                        "#" * 21 + "\n" + 
-                        "    Say command : \n" +
-                        "#" * 21 + "\n" +
-                        "#" * 21, 'yellow'))
+        print(colored(
+                    "#" * 21 + "\n" 
+                    + "#" * 21 + "\n"
+                    + "    Say command : \n"
+                    + "#" * 21 + "\n"
+                    + "#" * 21, 'yellow'
+                    ))
 
     for x in range(1, NB_CHANNELS + 1):
         CH_DATA['ch{}'.format(x)].append(round(args[x], 2))
@@ -66,7 +76,8 @@ def stream_window(*args):
     g_iter += 1
     if FILE_ITER == 10: # the number of files until it overwrites the first one.
         FILE_ITER = 0
-    if g_iter == 200 * INTERVAL: # number of lines of data until packed into a txt file.
+    if g_iter == 200 * INTERVAL: 
+        # number of lines of data until packing into a txt file.
         df = pd.DataFrame(CH_DATA)
         if FILE_ITER % 2 == 0:
             df.to_csv(STREAM_ROOT + str(FILE_ITER) + ".txt", ",")
@@ -80,17 +91,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
                         default="localhost", 
-                        help="The ip to listen on")
+                        help="The ip to listen on"
+                        )
     parser.add_argument("--port",
                         type=int, 
                         default=12345, 
-                        help="The port to listen on")
+                        help="The port to listen on"
+                        )
     parser.add_argument("--address",
                         default="/openbci", 
-                        help="address to listen to")
+                        help="address to listen to"
+                        )
     parser.add_argument("--option",
                         default="print",
-                        help="Debugger option")
+                        help="Debugger option"
+                        )
     args = parser.parse_args()
 
     if sys.version_info.major == 3:
